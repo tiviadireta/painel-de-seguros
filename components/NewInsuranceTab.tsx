@@ -1,9 +1,10 @@
+"use client";
 
 import React, { useState, useEffect } from 'react';
-import { MOCK_POLICIES, POST_SALES_ACTIONS, NEW_SALES_TEAM } from '../constants';
+import { MOCK_POLICIES, POST_SALES_ACTIONS, NEW_SALES_TEAM } from '@/lib/constants';
 import { Shield, MessageCircle, Filter } from 'lucide-react';
-import { useConfig } from '../contexts/ConfigContext';
-import { PolicyStatus, Policy } from '../types';
+import { useConfig } from '@/contexts/ConfigContext';
+import { PolicyStatus, Policy } from '@/lib/types';
 
 export const NewInsuranceTab: React.FC = () => {
   const { config } = useConfig();
@@ -14,9 +15,6 @@ export const NewInsuranceTab: React.FC = () => {
   const [postSales, setPostSales] = useState(POST_SALES_ACTIONS);
   const [selectedConsultant, setSelectedConsultant] = useState<string>('Todos');
 
-  // ==================================================================================
-  // INTEGRAÇÃO: Buscando novos seguros via Webhook configurável
-  // ==================================================================================
   useEffect(() => {
     const fetchNewSales = async () => {
         if (config.webhookNewSales) {

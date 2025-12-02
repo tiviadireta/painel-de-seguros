@@ -1,8 +1,9 @@
+"use client";
 
 import React, { useState, useEffect } from 'react';
 import { Save, Settings, Link as LinkIcon, UploadCloud, RotateCcw } from 'lucide-react';
-import { useConfig } from '../contexts/ConfigContext';
-import { AppConfig } from '../types';
+import { useConfig } from '@/contexts/ConfigContext';
+import { AppConfig } from '@/lib/types';
 
 export const SettingsTab: React.FC = () => {
   const { config, updateConfig, resetToEnv } = useConfig();

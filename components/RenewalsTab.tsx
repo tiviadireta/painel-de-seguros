@@ -1,9 +1,10 @@
+"use client";
 
 import React, { useState, useEffect } from 'react';
-import { MOCK_POLICIES, RENEWAL_TEAM } from '../constants';
+import { MOCK_POLICIES, RENEWAL_TEAM } from '@/lib/constants';
 import { RefreshCw, CheckCircle, XCircle, AlertCircle } from 'lucide-react';
-import { PolicyStatus, Policy } from '../types';
-import { useConfig } from '../contexts/ConfigContext';
+import { PolicyStatus, Policy } from '@/lib/types';
+import { useConfig } from '@/contexts/ConfigContext';
 
 export const RenewalsTab: React.FC = () => {
   const { config } = useConfig();
@@ -13,9 +14,6 @@ export const RenewalsTab: React.FC = () => {
   );
   const [selectedConsultant, setSelectedConsultant] = useState<string>('Todos');
 
-  // ==================================================================================
-  // INTEGRAÇÃO
-  // ==================================================================================
   useEffect(() => {
     const fetchRenewals = async () => {
         if (config.webhookRenewals) {

@@ -1,17 +1,15 @@
+"use client";
 
 import React, { useState, useEffect } from 'react';
 import { AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
-import { DASHBOARD_MOCK_DATA } from '../constants';
-import { useConfig } from '../contexts/ConfigContext';
-import { DashboardKPIs } from '../types';
+import { DASHBOARD_MOCK_DATA } from '@/lib/constants';
+import { useConfig } from '@/contexts/ConfigContext';
+import { DashboardKPIs } from '@/lib/types';
 
 export const ManagerTab: React.FC = () => {
   const { config } = useConfig();
   const [dashboardData, setDashboardData] = useState<DashboardKPIs>(DASHBOARD_MOCK_DATA);
 
-  // ==================================================================================
-  // INTEGRAÇÃO: Buscando dados do Gestor via Webhook configurável
-  // ==================================================================================
   useEffect(() => {
     const fetchKPIs = async () => {
         if (config.webhookManagerKPI) {
@@ -24,7 +22,6 @@ export const ManagerTab: React.FC = () => {
                 }
             } catch (error) {
                 console.error("Erro ao buscar KPIs:", error);
-                // Mantém o mock em caso de erro
             }
         }
     };
@@ -40,7 +37,7 @@ export const ManagerTab: React.FC = () => {
         </div>
       </div>
 
-      {/* Top KPI Rows - Mimicking the Excel Dashboard Black Cards */}
+      {/* Top KPI Rows */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
         
         {/* Card 1: Total de Renovação */}

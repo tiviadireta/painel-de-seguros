@@ -1,20 +1,20 @@
+"use client";
 
 import React, { useState, useEffect } from 'react';
 import { Save, User } from 'lucide-react';
-import { Policy, PolicyStatus } from '../types';
-import { MOCK_POLICIES } from '../constants';
-import { useConfig } from '../contexts/ConfigContext';
+import { Policy, PolicyStatus } from '@/lib/types';
+import { MOCK_POLICIES } from '@/lib/constants';
+import { useConfig } from '@/contexts/ConfigContext';
 
 export const ConsultantTab: React.FC = () => {
   const { config } = useConfig();
   
-  // Mock data filtered for 'Renan' to simulate logged user view
   const [policies, setPolicies] = useState<Policy[]>([]);
   const [isLoading, setIsLoading] = useState(false);
 
   const [formData, setFormData] = useState<Partial<Policy>>({
     status: PolicyStatus.EMITIDA,
-    consultantName: 'Renan', // Simulando usuário logado
+    consultantName: 'Renan',
     type: 'Seguro Novo',
     saleStructure: 'Online (pj1)'
   });
@@ -29,7 +29,6 @@ export const ConsultantTab: React.FC = () => {
            if (!response.ok) throw new Error('Erro na resposta da API');
            const data = await response.json();
            
-           // Assume que a API retorna um array de Policy
            if (Array.isArray(data)) {
              setPolicies(data);
            } else {
@@ -38,7 +37,6 @@ export const ConsultantTab: React.FC = () => {
            }
         } catch (error) {
           console.error("Erro ao buscar apólices:", error);
-          // Fallback silencioso para mocks em caso de erro (para não quebrar a demo)
           setPolicies(MOCK_POLICIES.filter(p => p.consultantName === 'Renan'));
         }
       } else {
@@ -72,7 +70,6 @@ export const ConsultantTab: React.FC = () => {
 
         if (response.ok) {
           alert('Sucesso! Dados enviados para o sistema.');
-          // Opcional: Recarregar a lista ou limpar formulário
         } else {
           alert('Erro ao salvar. Verifique o console.');
         }

@@ -1,22 +1,23 @@
-import React, { createContext, useContext, useState, ReactNode } from 'react';
-import { AppConfig } from '../types';
+"use client";
+
+import React, { createContext, useContext, useState, ReactNode, useEffect } from 'react';
+import { AppConfig } from '@/lib/types';
 
 const CONFIG_STORAGE_KEY = 'via_direta_config';
 
-// Helper seguro para acessar variáveis de ambiente
-// Isso previne o erro "process is not defined" caso o ambiente não injete o objeto globalmente
+// Helper seguro para acessar variáveis de ambiente no Next.js
 const getEnv = (key: string): string => {
   try {
-    // @ts-ignore
     if (typeof process !== 'undefined' && process.env) {
-      // @ts-ignore
-      return process.env[key] || '';
-    }
-    // Fallback para verificar se existe em import.meta.env (Vite/Modern Bundlers)
-    // @ts-ignore
-    if (typeof import.meta !== 'undefined' && import.meta.env) {
-      // @ts-ignore
-      return import.meta.env[key] || '';
+      const envs: Record<string, string | undefined> = {
+        'WEBHOOK_SAVE_POLICY': process.env.NEXT_PUBLIC_WEBHOOK_SAVE_POLICY,
+        'WEBHOOK_LIST_POLICIES': process.env.NEXT_PUBLIC_WEBHOOK_LIST_POLICIES,
+        'WEBHOOK_MANAGER_KPI': process.env.NEXT_PUBLIC_WEBHOOK_MANAGER_KPI,
+        'WEBHOOK_NEW_SALES': process.env.NEXT_PUBLIC_WEBHOOK_NEW_SALES,
+        'WEBHOOK_RENEWALS': process.env.NEXT_PUBLIC_WEBHOOK_RENEWALS,
+        'WEBHOOK_LEAD_DISTRIBUTION': process.env.NEXT_PUBLIC_WEBHOOK_LEAD_DISTRIBUTION
+      };
+      return envs[key] || '';
     }
   } catch (error) {
     console.warn(`Erro ao ler variável de ambiente ${key}:`, error);
@@ -24,7 +25,6 @@ const getEnv = (key: string): string => {
   return '';
 };
 
-// Configuração padrão lendo das Variáveis de Ambiente de forma segura
 const getEnvConfig = (): AppConfig => ({
   webhookConsultantSave: getEnv('WEBHOOK_SAVE_POLICY'),
   webhookConsultantList: getEnv('WEBHOOK_LIST_POLICIES'),
@@ -43,31 +43,31 @@ interface ConfigContextType {
 const ConfigContext = createContext<ConfigContextType | undefined>(undefined);
 
 export const ConfigProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
-  // Inicializa o estado mesclando Variáveis de Ambiente com LocalStorage
-  const [config, setConfig] = useState<AppConfig>(() => {
+  // Initialize state immediately with Env vars so the Provider is always valid
+  const [config, setConfig] = useState<AppConfig>(getEnvConfig());
+
+  useEffect(() => {
+    // Load from localStorage on client side mount
     const envConfig = getEnvConfig();
     const savedConfigString = localStorage.getItem(CONFIG_STORAGE_KEY);
     
     if (savedConfigString) {
       try {
         const savedConfig = JSON.parse(savedConfigString);
-        // Garante que campos vazios do localStorage possam ser preenchidos pelo env se disponíveis agora
-        // Prioriza o valor salvo, a menos que esteja vazio e o env tenha valor
-        return { 
+        setConfig({ 
           webhookConsultantSave: savedConfig.webhookConsultantSave || envConfig.webhookConsultantSave,
           webhookConsultantList: savedConfig.webhookConsultantList || envConfig.webhookConsultantList,
           webhookManagerKPI: savedConfig.webhookManagerKPI || envConfig.webhookManagerKPI,
           webhookNewSales: savedConfig.webhookNewSales || envConfig.webhookNewSales,
           webhookRenewals: savedConfig.webhookRenewals || envConfig.webhookRenewals,
           webhookLeadDistribution: savedConfig.webhookLeadDistribution || envConfig.webhookLeadDistribution,
-        };
+        });
       } catch (e) {
         console.error("Erro ao carregar configurações", e);
-        return envConfig;
+        setConfig(envConfig);
       }
     }
-    return envConfig;
-  });
+  }, []);
 
   const updateConfig = (newConfig: AppConfig) => {
     setConfig(newConfig);
@@ -79,6 +79,9 @@ export const ConfigProvider: React.FC<{ children: ReactNode }> = ({ children }) 
     setConfig(envConfig);
     localStorage.removeItem(CONFIG_STORAGE_KEY);
   };
+
+  // REMOVED: The check that returned <>{children}</> without Provider
+  // We always return the Provider now.
 
   return (
     <ConfigContext.Provider value={{ config, updateConfig, resetToEnv }}>

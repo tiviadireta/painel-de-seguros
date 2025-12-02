@@ -1,9 +1,10 @@
+"use client";
 
 import React, { useState } from 'react';
 import { UploadCloud, FileSpreadsheet, CheckCircle, UserCheck, Briefcase } from 'lucide-react';
-import { NEW_SALES_TEAM, RENEWAL_TEAM, MOCK_LEAD_BATCHES } from '../constants';
-import { useConfig } from '../contexts/ConfigContext';
-import { LeadBatch } from '../types';
+import { NEW_SALES_TEAM, RENEWAL_TEAM, MOCK_LEAD_BATCHES } from '@/lib/constants';
+import { useConfig } from '@/contexts/ConfigContext';
+import { LeadBatch } from '@/lib/types';
 
 export const LeadDistributionTab: React.FC = () => {
   const { config } = useConfig();
